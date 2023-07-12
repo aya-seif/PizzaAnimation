@@ -41,25 +41,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.example.pizzaanimation.composables.Scale
+import com.example.pizzaanimation.composables.SetImage
 import com.example.pizzaanimation.ui.theme.Rubik
-
-val items = listOf(
-    R.drawable.bread_1,
-    R.drawable.bread_2,
-    R.drawable.bread_3,
-    R.drawable.bread_4,
-    R.drawable.bread_5,
-)
-
-val pizzaSizes = listOf("S", "M", "L")
-
-val ingredientList = listOf(
-    R.drawable.basil_1,
-    R.drawable.broccoli_1,
-    R.drawable.mushroom_1,
-    R.drawable.onion_1,
-    R.drawable.sausage_1,
-)
 
 @Composable
 fun PizzaScreen() {
@@ -70,7 +54,16 @@ fun PizzaScreen() {
 @Composable
 fun PizzaScreenContent() {
 
+    var pizzaList by remember {
+        mutableStateOf(initialPizzaList)
+    }
+
+    var ingredientIndex by remember { mutableStateOf(0) }
+
+    var pagerIndex by remember { mutableStateOf(0) }
+
     val coroutineScope = rememberCoroutineScope()
+
 
     val scale = remember { Animatable(initialValue = 0.75f) }
     var sizeIndex by remember { mutableStateOf(0) }
@@ -107,8 +100,54 @@ fun PizzaScreenContent() {
                 .size(220.dp))
 
             val pagerState = rememberPagerState(initialPage = 0)
-            HorizontalPager(pageCount = items.size, state = pagerState) { index ->
-                PizzaImage(imgRes = items[index], scale = scale.value)
+            HorizontalPager(pageCount = pizzaList.size, state = pagerState) { index ->
+
+                pagerState.currentPage.let { currentPage ->
+                    if (currentPage != pagerIndex) {
+                        pagerIndex = currentPage
+                    }
+                }
+                Box (){
+                    PizzaImage(imgRes = pizzaList[index].pizzaImage, scale = scale.value)
+
+                    if (pizzaList[index].basilImage != null){
+                        SetImage(imageRes = pizzaList[index].basilImage!!, modifier = Modifier.size(30.dp)
+                            .align(Alignment.Center))
+                    }
+                    if (pizzaList[index].broccoliImage != null){
+                        pizzaList[index].broccoliImage?.let {
+                            SetImage(imageRes = it, modifier = Modifier.size(40.dp).align(Alignment.Center))
+                        }
+                    }
+                    if (pizzaList[index].mushroomImage != null){
+                        pizzaList[index].mushroomImage?.let {
+                            SetImage(imageRes = it, modifier = Modifier
+                                .size(50.dp)
+                                .align(
+                                    Alignment.BottomCenter
+                                ))
+                        }
+                    }
+                    if (pizzaList[index].onionImage != null){
+                        pizzaList[index].onionImage?.let {
+                            SetImage(imageRes = it, modifier = Modifier
+                                .size(60.dp)
+                                .align(
+                                    Alignment.Center
+                                ))
+                        }
+                    }
+                    if (pizzaList[index].sausageImage != null){
+                        pizzaList[index].sausageImage?.let {
+                            SetImage(imageRes = it, modifier = Modifier
+                                .size(70.dp)
+                                .align(
+                                    Alignment.BottomStart
+                                ))
+                        }
+                    }
+                }
+
             }
         }
 
@@ -143,7 +182,6 @@ fun PizzaScreenContent() {
                         )
                         .padding(16.dp)
                         .shadow(16.dp, CircleShape, true, Color.White, Color.White)
-
                 )
             }
         }
@@ -159,21 +197,66 @@ fun PizzaScreenContent() {
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp)
-        ){
-            items(ingredientList){
-                Image(modifier = Modifier.size(50.dp),painter = painterResource(id = it), contentDescription = "" )
+        ) {
+            items(ingredientList) { ingredient ->
+                Image(
+                    modifier = Modifier.size(50.dp).clickable {
+                        val index = ingredientList.indexOf(ingredient)
+                        val updatedPizza = when (index) {
+                            0 -> {
+                                if (pizzaList[pagerIndex].basilImage == null) {
+                                    pizzaList[pagerIndex].copy(basilImage = R.drawable.basil_1)
+                                } else {
+                                    pizzaList[pagerIndex].copy(basilImage = null)
+                                }
+                            }
+                            1 ->{
+                                 if (pizzaList[pagerIndex].broccoliImage == null) {
+                                     pizzaList[pagerIndex].copy(broccoliImage = R.drawable.broccoli_1)
+                                 } else {
+                                     pizzaList[pagerIndex].copy(broccoliImage = null)
+                                 }
+                             }
+                            2 -> {
+                                if (pizzaList[pagerIndex].mushroomImage == null) {
+                                    pizzaList[pagerIndex].copy(mushroomImage = R.drawable.mushroom_1)
+                                } else {
+                                    pizzaList[pagerIndex].copy(mushroomImage = null)
+                                }
+                            }
+                            3 -> {
+                                if (pizzaList[pagerIndex].onionImage == null) {
+                                    pizzaList[pagerIndex].copy(onionImage = R.drawable.onion_1)
+                                } else {
+                                    pizzaList[pagerIndex].copy(onionImage = null)
+                                }
+                            }
+                            4 -> {
+                                if (pizzaList[pagerIndex].sausageImage == null) {
+                                    pizzaList[pagerIndex].copy(sausageImage = R.drawable.sausage_1)
+                                } else {
+                                    pizzaList[pagerIndex].copy(sausageImage = null)
+                                }
+                            }
+                            else -> pizzaList[pagerIndex]
+                        }
+
+                        val updatedPizzaList = pizzaList.toMutableList().apply {
+                            set(pagerIndex, updatedPizza)
+                        }
+
+                        pizzaList = updatedPizzaList
+                        ingredientIndex = index
+                    },
+                    painter = painterResource(id = ingredient),
+                    contentDescription = ""
+                )
             }
         }
     }
 }
 
-fun Scale(selectedSize: Int): Float {
-    return when (selectedSize) {
-        0 -> return 0.75f
-        1 -> return 0.8f
-        else -> return 0.9f
-    }
-}
+
 
 @Composable
 fun PizzaImage(imgRes : Int , scale : Float ){
@@ -184,13 +267,20 @@ fun PizzaImage(imgRes : Int , scale : Float ){
             .size(200.dp))
     }
 }
+val pizzaSizes = listOf("S", "M", "L")
 
-@Composable
-fun SetImage(imageRes:Int , modifier: Modifier){
-    Image(
-        painter = painterResource(id = imageRes),
-        contentDescription = "",
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-    )
-}
+val ingredientList = listOf(
+    R.drawable.basil_1,
+    R.drawable.broccoli_1,
+    R.drawable.mushroom_1,
+    R.drawable.onion_1,
+    R.drawable.sausage_1,
+)
+
+var initialPizzaList = listOf(
+    Pizza(R.drawable.bread_1),
+    Pizza(R.drawable.bread_2),
+    Pizza(R.drawable.bread_3),
+    Pizza(R.drawable.bread_4),
+    Pizza(R.drawable.bread_5),
+)
