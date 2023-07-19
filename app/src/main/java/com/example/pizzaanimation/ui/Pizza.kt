@@ -4,11 +4,11 @@ import androidx.compose.ui.graphics.Color
 
 data class Pizza(
     val pizzaImage : Int,
-    var basilImage : Int? = null,
-    var broccoliImage : Int? = null,
-    var mushroomImage : Int? = null,
-    var onionImage : Int ? = null,
-    var sausageImage : Int? = null,
+    var basilImage : List<Int>? = null,
+    var broccoliImage : List<Int>? = null,
+    var mushroomImage : List<Int>? = null,
+    var onionImage : List<Int> ? = null,
+    var sausageImage : List<Int>? = null,
     var pizzaIngredients: PizzaIngredients = PizzaIngredients()
 )
 
