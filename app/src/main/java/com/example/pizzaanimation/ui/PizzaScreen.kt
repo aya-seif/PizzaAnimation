@@ -43,7 +43,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -56,7 +55,7 @@ import com.example.pizzaanimation.Constants.onionImages
 import com.example.pizzaanimation.Constants.pizzaSizes
 import com.example.pizzaanimation.Constants.sausageImages
 import com.example.pizzaanimation.composables.RandomImages
-import com.example.pizzaanimation.composables.Scale
+import com.example.pizzaanimation.composables.scale
 import com.example.pizzaanimation.composables.SetImage
 import com.example.pizzaanimation.composables.setIngredientBackgroundColor
 import com.example.pizzaanimation.ui.theme.Rubik
@@ -90,17 +89,20 @@ fun PizzaScreenContent() {
         ) {
 
             setIcon(
-                onClick = { }, modifier = Modifier.size(24.dp),
-                imageResource = R.drawable.icon_left
+                onClick = { }, modifier = Modifier.size(24.dp), imageResource = R.drawable.icon_left
             )
 
             Text(
-                text = "Pizza", modifier = Modifier, color = Color.Black, fontFamily = Rubik,
+                text = "Pizza",
+                modifier = Modifier,
+                color = Color.Black,
+                fontFamily = Rubik,
                 fontWeight = FontWeight.Bold
             )
 
             setIcon(
-                onClick = { }, modifier = Modifier.size(24.dp),
+                onClick = { },
+                modifier = Modifier.size(24.dp),
                 imageResource = R.drawable.icon_favorite
             )
         }
@@ -120,26 +122,50 @@ fun PizzaScreenContent() {
                         pagerIndex = currentPage
                     }
                 }
+//
+//                Box(
+//                    modifier = Modifier
+//                        .height(260.dp)
+//                        .fillMaxWidth()
+//                        .background(Color.Black)
+//                        .align(Alignment.Center),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//
+                val modifier = Modifier.matchParentSize()
+                PizzaImage(imgRes = pizzaList[index].pizzaImage, scale = scale.value)
+//
+                RandomImages(
+                    scale.value,
+                    images = pizzaList[index].basilImage,
+                    modifier = modifier
+                )
 
-                Box(
-                    modifier = Modifier
-                        .size(220.dp)
-                        .align(Alignment.Center), contentAlignment = Alignment.Center
-                ) {
+                RandomImages(
+                    scale.value,
+                    images = pizzaList[index].broccoliImage,
+                    modifier = modifier
+                )
 
-                    PizzaImage(imgRes = pizzaList[index].pizzaImage, scale = scale.value)
+                RandomImages(
+                    scale.value,
+                    images = pizzaList[index].mushroomImage,
+                    modifier = modifier
+                )
 
-                    RandomImages(Scale(sizeIndex), images = pizzaList[index].basilImage)
+                RandomImages(
+                    scale.value,
+                    images = pizzaList[index].onionImage,
+                    modifier = modifier
+                )
 
-                    RandomImages(Scale(sizeIndex), images = pizzaList[index].broccoliImage)
-
-                    RandomImages(Scale(sizeIndex), images = pizzaList[index].mushroomImage)
-
-                    RandomImages(Scale(sizeIndex), images = pizzaList[index].onionImage)
-
-                    RandomImages(Scale(sizeIndex), images = pizzaList[index].sausageImage)
-
-                }
+                RandomImages(
+                    scale.value,
+                    images = pizzaList[index].sausageImage,
+                    modifier = modifier
+                )
+//
+//                }
             }
         }
 
@@ -152,10 +178,15 @@ fun PizzaScreenContent() {
             textAlign = TextAlign.Center,
             fontFamily = Rubik,
             fontSize = 22.sp,
-            color = Color.Black, fontWeight = FontWeight.Bold
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
         )
 
-        Box(modifier = Modifier.wrapContentSize().align(Alignment.CenterHorizontally)) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.CenterHorizontally)
+        ) {
             val alignment by animateBackgroundAlignment(
                 when (sizeIndex) {
                     0 -> -1f
@@ -168,10 +199,7 @@ fun PizzaScreenContent() {
                     .align(alignment)
                     .size(42.dp)
                     .shadow(
-                        8.dp,
-                        CircleShape,
-                        spotColor = Color.Black,
-                        ambientColor = Color.Black
+                        8.dp, CircleShape, spotColor = Color.Black, ambientColor = Color.Black
                     )
                     .background(Color.White, shape = CircleShape)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -184,8 +212,7 @@ fun PizzaScreenContent() {
             ) {
 
                 pizzaSizes.forEachIndexed { index, size ->
-                    Text(
-                        text = size,
+                    Text(text = size,
                         modifier = Modifier
                             .padding(vertical = 10.dp, horizontal = 16.dp)
                             .clickable(
@@ -194,17 +221,18 @@ fun PizzaScreenContent() {
                             ) {
                                 sizeIndex = index
                                 coroutineScope.launch {
-                                    scale.animateTo(targetValue = Scale(selectedSize = index))
+                                    scale.animateTo(targetValue = scale(selectedSize = index))
                                 }
-                            }
-                    )
+                            })
                 }
             }
         }
 
 
         Text(
-            text = "CUSTOMIZE YOUR PIZZA", color = Color.LightGray, modifier = Modifier
+            text = "CUSTOMIZE YOUR PIZZA",
+            color = Color.LightGray,
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             fontFamily = Rubik,
@@ -217,123 +245,119 @@ fun PizzaScreenContent() {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val color = Color(
-                red = 215,
-                green = 235,
-                blue = 221
+                red = 215, green = 235, blue = 221
             )
             itemsIndexed(ingredientList) { i, ingredient ->
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .clickable {
-                            val index = ingredientList.indexOf(ingredient)
-                            val currentIngredients = pizzaList[pagerIndex].pizzaIngredients
+                Box(modifier = Modifier
+                    .wrapContentSize()
+                    .clickable {
+                        val index = ingredientList.indexOf(ingredient)
+                        val currentIngredients = pizzaList[pagerIndex].pizzaIngredients
 
-                            val updatedPizza = when (index) {
+                        val updatedPizza = when (index) {
 
-                                0 -> {
-                                    if (pizzaList[pagerIndex].basilImage == null) {
-                                        pizzaList[pagerIndex].copy(
-                                            basilImage = basilImages,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                basilImageColor = color
-                                            )
+                            0 -> {
+                                if (pizzaList[pagerIndex].basilImage == null) {
+                                    pizzaList[pagerIndex].copy(
+                                        basilImage = basilImages,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            basilImageColor = color
                                         )
-                                    } else {
-                                        pizzaList[pagerIndex].copy(
-                                            basilImage = null,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                basilImageColor = null
-                                            )
+                                    )
+                                } else {
+                                    pizzaList[pagerIndex].copy(
+                                        basilImage = null,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            basilImageColor = null
                                         )
-                                    }
+                                    )
                                 }
-
-                                1 -> {
-                                    if (pizzaList[pagerIndex].broccoliImage == null) {
-                                        pizzaList[pagerIndex].copy(
-                                            broccoliImage = broccoliImages,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                broccoliImageColor = color
-                                            )
-                                        )
-                                    } else {
-                                        pizzaList[pagerIndex].copy(
-                                            broccoliImage = null,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                broccoliImageColor = null
-                                            )
-                                        )
-                                    }
-                                }
-
-                                2 -> {
-                                    if (pizzaList[pagerIndex].mushroomImage == null) {
-                                        pizzaList[pagerIndex].copy(
-                                            mushroomImage = mushroomImages,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                mushroomImageColor = color
-                                            )
-                                        )
-                                    } else {
-                                        pizzaList[pagerIndex].copy(
-                                            mushroomImage = null,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                mushroomImageColor = null
-                                            )
-                                        )
-                                    }
-                                }
-
-                                3 -> {
-                                    if (pizzaList[pagerIndex].onionImage == null) {
-                                        pizzaList[pagerIndex].copy(
-                                            onionImage = onionImages,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                onionImageColor = color
-                                            )
-                                        )
-                                    } else {
-                                        pizzaList[pagerIndex].copy(
-                                            onionImage = null,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                onionImageColor = null
-                                            )
-                                        )
-                                    }
-                                }
-
-                                4 -> {
-                                    if (pizzaList[pagerIndex].sausageImage == null) {
-                                        pizzaList[pagerIndex].copy(
-                                            sausageImage = sausageImages,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                sausageImageColor = color
-                                            )
-                                        )
-                                    } else {
-                                        pizzaList[pagerIndex].copy(
-                                            sausageImage = null,
-                                            pizzaIngredients = currentIngredients.copy(
-                                                sausageImageColor = null
-                                            )
-                                        )
-                                    }
-                                }
-
-                                else -> pizzaList[pagerIndex]
                             }
 
-                            val updatedPizzaList = pizzaList
-                                .toMutableList()
-                                .apply {
-                                    set(pagerIndex, updatedPizza)
+                            1 -> {
+                                if (pizzaList[pagerIndex].broccoliImage == null) {
+                                    pizzaList[pagerIndex].copy(
+                                        broccoliImage = broccoliImages,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            broccoliImageColor = color
+                                        )
+                                    )
+                                } else {
+                                    pizzaList[pagerIndex].copy(
+                                        broccoliImage = null,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            broccoliImageColor = null
+                                        )
+                                    )
                                 }
+                            }
 
-                            pizzaList = updatedPizzaList
-                            ingredientIndex = index
+                            2 -> {
+                                if (pizzaList[pagerIndex].mushroomImage == null) {
+                                    pizzaList[pagerIndex].copy(
+                                        mushroomImage = mushroomImages,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            mushroomImageColor = color
+                                        )
+                                    )
+                                } else {
+                                    pizzaList[pagerIndex].copy(
+                                        mushroomImage = null,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            mushroomImageColor = null
+                                        )
+                                    )
+                                }
+                            }
+
+                            3 -> {
+                                if (pizzaList[pagerIndex].onionImage == null) {
+                                    pizzaList[pagerIndex].copy(
+                                        onionImage = onionImages,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            onionImageColor = color
+                                        )
+                                    )
+                                } else {
+                                    pizzaList[pagerIndex].copy(
+                                        onionImage = null,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            onionImageColor = null
+                                        )
+                                    )
+                                }
+                            }
+
+                            4 -> {
+                                if (pizzaList[pagerIndex].sausageImage == null) {
+                                    pizzaList[pagerIndex].copy(
+                                        sausageImage = sausageImages,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            sausageImageColor = color
+                                        )
+                                    )
+                                } else {
+                                    pizzaList[pagerIndex].copy(
+                                        sausageImage = null,
+                                        pizzaIngredients = currentIngredients.copy(
+                                            sausageImageColor = null
+                                        )
+                                    )
+                                }
+                            }
+
+                            else -> pizzaList[pagerIndex]
                         }
-                ) {
+
+                        val updatedPizzaList = pizzaList
+                            .toMutableList()
+                            .apply {
+                                set(pagerIndex, updatedPizza)
+                            }
+
+                        pizzaList = updatedPizzaList
+                        ingredientIndex = index
+                    }) {
                     Box(
                         modifier = Modifier
                             .size(55.dp)
@@ -362,7 +386,7 @@ fun PizzaScreenContent() {
 fun PizzaImage(imgRes: Int, scale: Float) {
     SetImage(
         imageRes = imgRes, modifier = Modifier
-            .padding(16.dp)
+//            .padding(16.dp)
             .scale(scale = scale)
             .size(200.dp)
     )
@@ -380,15 +404,13 @@ fun toggleIngredientImage(
         0 -> {
             if (pizzaList[pagerIndex].basilImage == null) {
                 pizzaList[pagerIndex].copy(
-                    basilImage = ingredientImages,
-                    pizzaIngredients = currentIngredients.copy(
+                    basilImage = ingredientImages, pizzaIngredients = currentIngredients.copy(
                         basilImageColor = color
                     )
                 )
             } else {
                 pizzaList[pagerIndex].copy(
-                    basilImage = null,
-                    pizzaIngredients = currentIngredients.copy(
+                    basilImage = null, pizzaIngredients = currentIngredients.copy(
                         basilImageColor = null
                     )
                 )
@@ -398,15 +420,13 @@ fun toggleIngredientImage(
         1 -> {
             if (pizzaList[pagerIndex].broccoliImage == null) {
                 pizzaList[pagerIndex].copy(
-                    broccoliImage = ingredientImages,
-                    pizzaIngredients = currentIngredients.copy(
+                    broccoliImage = ingredientImages, pizzaIngredients = currentIngredients.copy(
                         broccoliImageColor = color
                     )
                 )
             } else {
                 pizzaList[pagerIndex].copy(
-                    broccoliImage = null,
-                    pizzaIngredients = currentIngredients.copy(
+                    broccoliImage = null, pizzaIngredients = currentIngredients.copy(
                         broccoliImageColor = null
                     )
                 )
@@ -416,15 +436,13 @@ fun toggleIngredientImage(
         2 -> {
             if (pizzaList[pagerIndex].mushroomImage == null) {
                 pizzaList[pagerIndex].copy(
-                    mushroomImage = ingredientImages,
-                    pizzaIngredients = currentIngredients.copy(
+                    mushroomImage = ingredientImages, pizzaIngredients = currentIngredients.copy(
                         mushroomImageColor = color
                     )
                 )
             } else {
                 pizzaList[pagerIndex].copy(
-                    mushroomImage = null,
-                    pizzaIngredients = currentIngredients.copy(
+                    mushroomImage = null, pizzaIngredients = currentIngredients.copy(
                         mushroomImageColor = null
                     )
                 )
@@ -434,15 +452,13 @@ fun toggleIngredientImage(
         3 -> {
             if (pizzaList[pagerIndex].onionImage == null) {
                 pizzaList[pagerIndex].copy(
-                    onionImage = ingredientImages,
-                    pizzaIngredients = currentIngredients.copy(
+                    onionImage = ingredientImages, pizzaIngredients = currentIngredients.copy(
                         onionImageColor = color
                     )
                 )
             } else {
                 pizzaList[pagerIndex].copy(
-                    onionImage = null,
-                    pizzaIngredients = currentIngredients.copy(
+                    onionImage = null, pizzaIngredients = currentIngredients.copy(
                         onionImageColor = null
                     )
                 )
@@ -452,15 +468,13 @@ fun toggleIngredientImage(
         4 -> {
             if (pizzaList[pagerIndex].sausageImage == null) {
                 pizzaList[pagerIndex].copy(
-                    sausageImage = ingredientImages,
-                    pizzaIngredients = currentIngredients.copy(
+                    sausageImage = ingredientImages, pizzaIngredients = currentIngredients.copy(
                         sausageImageColor = color
                     )
                 )
             } else {
                 pizzaList[pagerIndex].copy(
-                    sausageImage = null,
-                    pizzaIngredients = currentIngredients.copy(
+                    sausageImage = null, pizzaIngredients = currentIngredients.copy(
                         sausageImageColor = null
                     )
                 )
@@ -474,15 +488,12 @@ fun toggleIngredientImage(
 @Composable
 fun animateBackgroundAlignment(targetValue: Float): State<BiasAlignment> {
     val horizontalBias by animateFloatAsState(
-        targetValue = targetValue,
-        animationSpec = tween(100),
-        label = ""
+        targetValue = targetValue, animationSpec = tween(100), label = ""
     )
     return remember {
         derivedStateOf {
             BiasAlignment(
-                horizontalBias = horizontalBias,
-                verticalBias = 0f
+                horizontalBias = horizontalBias, verticalBias = 0f
             )
         }
     }

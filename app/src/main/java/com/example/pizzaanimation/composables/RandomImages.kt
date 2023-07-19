@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -27,16 +29,12 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun RandomImages(scale: Float, images: List<Int>?) {
+fun RandomImages(scale: Float, images: List<Int>?, modifier: Modifier = Modifier) {
 
     val toppingsScale = remember { Animatable(3f) }
 
     Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .padding(16.dp)
-            .fillMaxSize()
-
+        modifier = modifier.scale(scale)
     ) {
 
         AnimatedVisibility(
@@ -44,16 +42,16 @@ fun RandomImages(scale: Float, images: List<Int>?) {
             enter = scaleIn(
                 animationSpec = tween(2000),
                 initialScale = 2f,
-                transformOrigin = TransformOrigin(pivotFractionY = 0.5f , pivotFractionX = 0.8f)
+                transformOrigin = TransformOrigin.Center
             ),
-            exit = scaleOut(tween(1000))
+            exit = scaleOut()
         ) {
 
             images?.forEach { image ->
                 val randomOffsetX =
-                    remember { mutableStateOf(Random.nextInt(30, (145 * scale).toInt())) }
+                    remember { mutableStateOf(Random.nextInt(105, 230)) }
                 val randomOffsetY =
-                    remember { mutableStateOf(Random.nextInt(30, (155 * scale).toInt())) }
+                    remember { mutableStateOf(Random.nextInt(10, 160)) }
                 Image(
                     painter = painterResource(id = image),
                     contentDescription = null,
